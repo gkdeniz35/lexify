@@ -1,18 +1,22 @@
 "use client"
-import { useState } from "react"
+import { useState, useRef } from "react"
 
 type Message = { role: "user" | "assistant"; content: string }
 
 export default function ChatPage() {
   const [messages, setMessages] = useState<Message[]>([
-    { role: "assistant", content: "Merhaba! 👋 Ben Lexify AI Öğretmeni.\n\n• İngilizce cümle yaz, düzelteyim ✍️\n• Kelime sor, açıklayayım 📚\n• Gramer soruları sor 💡\n\nNasıl yardımcı olabilirim?" }
+    { role: "assistant", content: "Merhaba! 👋 Ben Lexify AI Öğretmeni.\n\n• İngilizce cümle yaz, düzelteyim ✍️\n• Kelime sor, açıklayayım 📚\n• Gramer soruları sor 💡\n• Mikrofona konuş veya yanıtları dinle 🎤\n\nNasıl yardımcı olabilirim?" }
   ])
   const [input, setInput] = useState("")
   const [loading, setLoading] = useState(false)
+  const [listening, setListening] = useState(false)
+  const [speaking, setSpeaking] = useState(false)
+  const recognitionRef = useRef<any>(null)
 
-  const sendMessage = async () => {
-    if (!input.trim() || loading) return
-    const userMsg: Message = { role: "user", content: input }
+  const sendMessage = async (text?: string) => {
+    const msg = text || input
+    if (!msg.trim() || loading) return
+    const userMsg: Message = { role: "user", content: msg }
     const newMessages = [...messages, userMsg]
     setMessages(newMessages)
     setInput("")
@@ -32,8 +36,53 @@ export default function ChatPage() {
       }),
     })
     const data = await res.json()
-    setMessages(prev => [...prev, { role: "assistant", content: data.message }])
+    const assistantMsg = { role: "assistant" as const, content: data.message }
+    setMessages(prev => [...prev, assistantMsg])
     setLoading(false)
+    speakText(data.message)
+  }
+
+  const startListening = () => {
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition
+    if (!SpeechRecognition) {
+      alert("Tarayıcın ses tanımayı desteklemiyor.")
+      return
+    }
+    const recognition = new SpeechRecognition()
+    recognition.lang = "tr-TR"
+    recognition.interimResults = false
+    recognition.onstart = () => setListening(true)
+    recognition.onend = () => setListening(false)
+    recognition.onresult = (e: any) => {
+      const transcript = e.results[0][0].transcript
+      setInput(transcript)
+      sendMessage(transcript)
+    }
+    recognition.onerror = () => setListening(false)
+    recognitionRef.current = recognition
+    recognition.start()
+  }
+
+  const stopListening = () => {
+    recognitionRef.current?.stop()
+    setListening(false)
+  }
+
+  const speakText = (text: string) => {
+    window.speechSynthesis.cancel()
+    const cleanText = text.replace(/[*•#]/g, "")
+    const utterance = new SpeechSynthesisUtterance(cleanText)
+    utterance.lang = "tr-TR"
+    utterance.rate = 0.95
+    utterance.pitch = 1
+    utterance.onstart = () => setSpeaking(true)
+    utterance.onend = () => setSpeaking(false)
+    window.speechSynthesis.speak(utterance)
+  }
+
+  const stopSpeaking = () => {
+    window.speechSynthesis.cancel()
+    setSpeaking(false)
   }
 
   return (
@@ -41,7 +90,14 @@ export default function ChatPage() {
       {/* NAVBAR */}
       <nav className="bg-white border-b border-gray-200 px-8 py-4 flex items-center justify-between">
         <a href="/"><img src="/lexify-logo.svg" alt="Lexify" className="h-10" /></a>
-        <h2 className="font-bold text-gray-700">🤖 AI Öğretmen</h2>
+        <div className="flex items-center gap-3">
+          <h2 className="font-bold text-gray-700">🤖 AI Öğretmen</h2>
+          {speaking && (
+            <button onClick={stopSpeaking} className="bg-red-100 text-red-600 text-xs font-bold px-3 py-1 rounded-full animate-pulse">
+              🔊 Duraksat
+            </button>
+          )}
+        </div>
         <a href="/" className="text-gray-400 hover:text-gray-600 text-sm">← Ana Sayfa</a>
       </nav>
 
@@ -51,11 +107,19 @@ export default function ChatPage() {
           {messages.map((msg, i) => (
             <div key={i} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
               <div className={`max-w-lg px-5 py-4 rounded-2xl text-sm whitespace-pre-line ${
-                msg.role === "user" 
-                  ? "bg-purple-600 text-white" 
+                msg.role === "user"
+                  ? "bg-purple-600 text-white"
                   : "bg-white border border-gray-200 text-gray-800 shadow-sm"
               }`}>
                 {msg.content}
+                {msg.role === "assistant" && (
+                  <button
+                    onClick={() => speakText(msg.content)}
+                    className="block mt-2 text-xs text-gray-400 hover:text-purple-500 transition-colors"
+                  >
+                    🔊 Dinle
+                  </button>
+                )}
               </div>
             </div>
           ))}
@@ -74,18 +138,33 @@ export default function ChatPage() {
             value={input}
             onChange={e => setInput(e.target.value)}
             onKeyDown={e => e.key === "Enter" && sendMessage()}
-            placeholder="Cümle yaz, kelime sor, gramer sorusu sor..."
+            placeholder="Cümle yaz, kelime sor veya mikrofona konuş..."
             className="flex-1 p-4 bg-white border border-gray-200 rounded-2xl text-gray-900 text-sm placeholder-gray-400 focus:outline-none focus:border-purple-400 shadow-sm"
           />
-          <button 
-            onClick={sendMessage} 
+          <button
+            onClick={listening ? stopListening : startListening}
+            className={`px-4 rounded-2xl transition-all font-bold text-lg ${
+              listening
+                ? "bg-red-500 hover:bg-red-600 text-white animate-pulse"
+                : "bg-gray-100 hover:bg-gray-200 text-gray-600"
+            }`}
+            title="Sesli konuş"
+          >
+            🎤
+          </button>
+          <button
+            onClick={() => sendMessage()}
             disabled={loading}
             className="bg-purple-600 hover:bg-purple-700 disabled:opacity-50 text-white px-6 rounded-2xl transition-colors font-bold"
           >
             →
           </button>
         </div>
+        {listening && (
+          <p className="text-center text-sm text-red-500 mt-2 animate-pulse">🎤 Dinleniyor... Konuşmayı bitirince duraksatılacak</p>
+        )}
       </div>
     </div>
   )
 }
+```
