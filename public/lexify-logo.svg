@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 120" width="400" height="120">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#6C2BD9;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#06B6D4;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="iconGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#A78BFA;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#67E8F9;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="textGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#7C3AED;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#0891B2;stop-opacity:1" />
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <filter id="softShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="4" stdDeviation="8" flood-color="#6C2BD9" flood-opacity="0.3"/>
+    </filter>
+  </defs>
+
+  <!-- Icon Background Circle -->
+  <circle cx="60" cy="60" r="48" fill="url(#bgGrad)" filter="url(#softShadow)"/>
+  
+  <!-- Inner glow ring -->
+  <circle cx="60" cy="60" r="44" fill="none" stroke="white" stroke-opacity="0.15" stroke-width="1"/>
+
+  <!-- Book / Letter L shape -->
+  <!-- Open book pages -->
+  <path d="M36 40 Q48 36 60 40 L60 82 Q48 78 36 82 Z" fill="white" fill-opacity="0.95"/>
+  <path d="M84 40 Q72 36 60 40 L60 82 Q72 78 84 82 Z" fill="white" fill-opacity="0.8"/>
+  
+  <!-- Book spine line -->
+  <line x1="60" y1="40" x2="60" y2="82" stroke="url(#bgGrad)" stroke-width="2"/>
+  
+  <!-- Text lines on left page -->
+  <line x1="40" y1="50" x2="57" y2="48" stroke="url(#bgGrad)" stroke-width="2" stroke-linecap="round" opacity="0.6"/>
+  <line x1="40" y1="57" x2="57" y2="55" stroke="url(#bgGrad)" stroke-width="2" stroke-linecap="round" opacity="0.6"/>
+  <line x1="40" y1="64" x2="57" y2="62" stroke="url(#bgGrad)" stroke-width="2" stroke-linecap="round" opacity="0.6"/>
+  <line x1="40" y1="71" x2="52" y2="70" stroke="url(#bgGrad)" stroke-width="2" stroke-linecap="round" opacity="0.4"/>
+
+  <!-- Text lines on right page -->
+  <line x1="63" y1="48" x2="80" y2="50" stroke="url(#bgGrad)" stroke-width="2" stroke-linecap="round" opacity="0.4"/>
+  <line x1="63" y1="55" x2="80" y2="57" stroke="url(#bgGrad)" stroke-width="2" stroke-linecap="round" opacity="0.4"/>
+  <line x1="63" y1="62" x2="80" y2="64" stroke="url(#bgGrad)" stroke-width="2" stroke-linecap="round" opacity="0.4"/>
+
+  <!-- Small star/sparkle top right of icon -->
+  <g transform="translate(90, 22)" filter="url(#glow)">
+    <path d="M0 -6 L1.5 -1.5 L6 0 L1.5 1.5 L0 6 L-1.5 1.5 L-6 0 L-1.5 -1.5 Z" fill="#A78BFA"/>
+  </g>
+
+  <!-- LEXIFY text -->
+  <text x="128" y="52" font-family="Georgia, 'Times New Roman', serif" font-size="42" font-weight="700" letter-spacing="-1" fill="url(#textGrad)">LEXIFY</text>
+
+  <!-- Tagline -->
+  <text x="130" y="72" font-family="'Courier New', monospace" font-size="12" letter-spacing="3" fill="#6B7280" font-weight="400">LEARN · GROW · EXCEL</text>
+
+  <!-- Decorative underline -->
+  <rect x="128" y="80" width="220" height="2.5" rx="1.5" fill="url(#textGrad)" opacity="0.4"/>
+  
+  <!-- Small dots decoration -->
+  <circle cx="128" cy="81" r="3" fill="#7C3AED" opacity="0.7"/>
+  <circle cx="348" cy="81" r="3" fill="#0891B2" opacity="0.7"/>
+
+</svg>

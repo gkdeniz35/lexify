@@ -4,7 +4,7 @@ export default function Home() {
 
       {/* NAVBAR */}
       <nav className="fixed top-0 left-0 right-0 bg-white bg-opacity-90 backdrop-blur border-b border-gray-100 px-8 py-4 flex items-center justify-between z-50">
-        <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-cyan-500 bg-clip-text text-transparent">LEXIFY</h1>
+        <img src="/lexify-logo.svg" alt="Lexify" className="h-10" />
         <div className="flex gap-6">
           <a href="/words" className="text-gray-500 hover:text-purple-600 font-medium text-sm transition-colors">Kelimeler</a>
           <a href="/quiz" className="text-gray-500 hover:text-purple-600 font-medium text-sm transition-colors">Quiz</a>
